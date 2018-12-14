@@ -70,8 +70,8 @@
 
 /******* KEY16  DEFINE ************************************************************************************/
 //#if ( KEY16==1 )
-	#define Key_Bus						 GPIOF                /*用户实际需要修改*/
-	#define Key_Bus_CLK				 RCC_APB2Periph_GPIOF /*用户实际需要修改*/
+	#define Key_Bus						 GPIOA                /*用户实际需要修改*/
+	#define Key_Bus_CLK				 RCC_APB2Periph_GPIOA /*用户实际需要修改*/
 	#define Key_Bus_L4				 (GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3)
 	#define Key_Bus_H4				 (GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7)
 //#endif

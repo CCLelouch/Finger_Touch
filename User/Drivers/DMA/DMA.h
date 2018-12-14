@@ -20,8 +20,8 @@
 
 /************************************UART*********************************************/
 #define DEF_DMA_USART1             0/*Set 1 To Open DMA_USART1*/
-#define DEF_DMA_USART2             1/*Set 1 To Open DMA_USART2*/
-#define DEF_DMA_USART3             0/*Set 1 To Open DMA_USART3*/
+#define DEF_DMA_USART2             0/*Set 1 To Open DMA_USART2*/
+#define DEF_DMA_USART3             1/*Set 1 To Open DMA_USART3*/
 #define DMA_UART_TX_BUFSIZE        64/*串口缓冲区数组大小配置*/
 #define DMA_UART_RX_BUFSIZE        64/*串口缓冲区数组大小配置*/
 #define DMA_UART_DMABUFSIZE        64/*DMA大小配置*/

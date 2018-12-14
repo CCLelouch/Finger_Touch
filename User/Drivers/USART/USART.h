@@ -26,7 +26,7 @@
 /* 串口使用定义 */
 #define STDIO_USART                      USART1//要用中断就不要定义这个鬼东西(不用中断可以printf)
 #define DEF_USART1                       1//1开启串口，0关闭串口
-#define DEF_USART2                       1//1开启串口，0关闭串口
+#define DEF_USART2                       0//1开启串口，0关闭串口
 #define DEF_USART3                       1//1开启串口，0关闭串口
 #define REMAP_USER1                      0//普通(0) TX\PA9  RX\PA10;重映射(1), TX\PA6  RX\PA7; 
 #define REMAP_USER2                      0//普通(0) TX\PA2  RX\PA3; 重映射(1), TX\PD5  RX\PD6; 

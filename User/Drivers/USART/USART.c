@@ -136,9 +136,9 @@ void USART_Config(void)
   #endif
 /******************************************* USART3 ******************************************/
   #if (DEF_USART3 == 1)
-    MyUSART1_Type.BaudRate = USER_USART3_BAUDRATE;
-    MyUSART1_Type.Parity   = USER_USART3_Parity;
-    MyUSART1_Type.Mode     = USER_USART3_Mode;
+    MyUSART3_Type.BaudRate = USER_USART3_BAUDRATE;
+    MyUSART3_Type.Parity   = USER_USART3_Parity;
+    MyUSART3_Type.Mode     = USER_USART3_Mode;
     
     RCC_APB2PeriphClockCmd(USER_USART3_GPIO_CLK, ENABLE);// 打开串口GPIO的时钟		
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);//USART外设时钟 

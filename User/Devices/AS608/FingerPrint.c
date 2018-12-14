@@ -273,7 +273,7 @@ void FingerProcess(void)
       {
         FingerSta = entry; 
       }
-      else if(KeyBuffer.Name==Key_13&&KeyBuffer.ReadFlag == 1)
+      else if(KeyBuffer.Name==Key_8&&KeyBuffer.ReadFlag == 1)
       {
         FingerSta = clear;
       }
@@ -288,8 +288,11 @@ void FingerProcess(void)
       FingerSta = recognize;
       break;
     case clear:
-      Del_FR();
-      FingerSta = recognize;
+      if(687 == GetKeyValue())/*687才可以改密码*/
+      {
+        Del_FR();    
+      }
+      FingerSta = recognize;  
       break;
   }
 }

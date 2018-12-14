@@ -12,7 +12,7 @@ void PS_StaGPIO_Init(void)
   GPIO_InitTypeDef  GPIO_InitStructure;
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);//使能GPIOA时钟
   //初始化读状态引脚GPIOA
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;//输入下拉模式
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//50MHz
   GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化GPIO	
@@ -20,8 +20,8 @@ void PS_StaGPIO_Init(void)
 //串口发送一个字节
 static void MYUSART_SendData(u8 data)
 {
-	while((USART2->SR&0X40)==0); 
-	USART2->DR = data;
+	while((AS608_USART->SR&0X40)==0); 
+	AS608_USART->DR = data;
 }
 //发送包头
 static void SendHead(void)
@@ -70,13 +70,13 @@ static u8 *JudgeStr(u16 waittime)
 	str[0]=0xef;str[1]=0x01;str[2]=AS608Addr>>24;
 	str[3]=AS608Addr>>16;str[4]=AS608Addr>>8;
 	str[5]=AS608Addr;str[6]=0x07;str[7]='\0';
-	MyUSART2_Type.STA_RX=0;
+	AS608_USART_Type.STA_RX=0;
 	while(--waittime)
 	{
 		Delay_usms(1 ms);
-		if(MyUSART2_Type.STA_RX&0X8000)//接收到一次数据
+		if(AS608_USART_Type.STA_RX&0X8000)//接收到一次数据
 		{
-			MyUSART2_Type.STA_RX=0;
+			AS608_USART_Type.STA_RX=0;
 			data=strstr((const char*)AS608_USART_RX_BUF,(const char*)str);/*匹配子字符串，返回子字符串首地址*/
 			if(data)
 				return (u8*)data;	
@@ -531,7 +531,7 @@ u8 PS_HandShake(u32 *PS_Addr)
 	MYUSART_SendData(0X00);	
 	Delay_usms(200 ms);
   
-	if(MyUSART2_Type.STA_RX&0X8000)//接收到数据
+	if(AS608_USART_Type.STA_RX&0X8000)//接收到数据
 	{
 		if(//判断是不是模块返回的应答包				
 					AS608_USART_RX_BUF[0]==0XEF
@@ -541,12 +541,12 @@ u8 PS_HandShake(u32 *PS_Addr)
 			{
 				*PS_Addr=(AS608_USART_RX_BUF[2]<<24) + (AS608_USART_RX_BUF[3]<<16)
 								+(AS608_USART_RX_BUF[4]<<8) + (AS608_USART_RX_BUF[5]);
-				MyUSART2_Type.STA_RX=0;
+				AS608_USART_Type.STA_RX=0;
         
 				return 0;
 			}
       
-		MyUSART2_Type.STA_RX=0;					
+		AS608_USART_Type.STA_RX=0;					
 	}
 	return 1;		
 }

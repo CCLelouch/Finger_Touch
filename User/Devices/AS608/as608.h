@@ -4,10 +4,13 @@
 #include "stm32f10x.h" 
 #include "USART.H"
 
-#define PS_Sta   PAIn(6)//读指纹模块状态引脚
+#define PS_Sta   PAIn(8)//读指纹模块状态引脚
 #define CharBuffer1 0x01
 #define CharBuffer2 0x02
-#define AS608_USART_RX_BUF  MyUSART2_Type.RX_Buff
+
+#define AS608_USART         USART3
+#define AS608_USART_Type    MyUSART3_Type
+#define AS608_USART_RX_BUF  AS608_USART_Type.RX_Buff
 extern u32 AS608Addr;//模块地址
 
 typedef struct  
