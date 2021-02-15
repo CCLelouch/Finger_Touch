@@ -2,213 +2,213 @@
   ******************************************************************************
   * &file    bsp_key.c
   * &author  CC
-	* &previous versions V2.0.0
+  * &previous versions V2.0.0
   * &version V3.1.0
   * &date    2018-11-14
   * &brief   
   ******************************************************************************
   * &attention
-  *	Ê¹ÓÃÇ°ÇëÏÈ#define 	KEY16
-	*					»ò#define		KEY4
-	* Key_ReadStr.ReadFlag == 1 && Key_ReadStr.Active.Press == ShortPress ²»ÄÜÍ¬Ê±³öÏÖ
-	* ÊµÏÖÁË¶ÀÁ¢°´¼üÒÔ¼°4*4¾ØÕó¼üÅÌ£¬ÒÔ¼°ÓĞĞ§µçÆ½µÄ¿ØÖÆ
+  * ä½¿ç”¨å‰è¯·å…ˆ#define    KEY16
+  *					æˆ–#define		KEY4
+  * Key_ReadStr.ReadFlag == 1 && Key_ReadStr.Active.Press == ShortPress ä¸èƒ½åŒæ—¶å‡ºç°
+  * å®ç°äº†ç‹¬ç«‹æŒ‰é”®ä»¥åŠ4*4çŸ©é˜µé”®ç›˜ï¼Œä»¥åŠæœ‰æ•ˆç”µå¹³çš„æ§åˆ¶
   ******************************************************************************
   */
 #include "bsp_key.h"
 
 Key_Typedef KeyBuffer;
 
-/** &brief  KEY_GPIO_Config():ÓÃ»§½Ó¿Úº¯Êı
-	*  Ê¹ÓÃÇ°ÏÈ¶¨Òå#define KEY4
-	*              #define KEY16
+/** &brief  KEY_GPIO_Config():ç”¨æˆ·æ¥å£å‡½æ•°
+  *  ä½¿ç”¨å‰å…ˆå®šä¹‰#define KEY4
+  *              #define KEY16
   *     &arg x...........
   * &retval None.
   */
 void Key_GPIO_Config()
 {
-	#if ( KEYSPR==1	 )		/* ¶ÀÁ¢°´¼ü¿ÉÒÔÊ¹ÓÃÁãÉ¢¶Ë¿Ú */
-    KEYSPR_GPIOCONFIG;
-		GPIO_SetBits(Key_Bus,Key_Bus_L4 );
-	#endif
-	
-	#if ( KEY16==1 )		/* ¾ØÕó°´¼üÖ»ÄÜÊ¹ÓÃµ¥Ò»×ÜÏß */
-		GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_L4 , GPIO_Speed_50MHz, GPIO_Mode_Out_PP);
-		GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_H4, GPIO_Speed_50MHz, GPIO_Mode_CLAMP);	
-		GPIO_SetBits  (Key_Bus,	Key_Bus_L4 );
-		GPIO_ResetBits(Key_Bus, Key_Bus_H4);
-	#endif
+  #if ( KEYSPR==1 )  /* ç‹¬ç«‹æŒ‰é”®å¯ä»¥ä½¿ç”¨é›¶æ•£ç«¯å£ */
+  KEYSPR_GPIOCONFIG;
+  GPIO_SetBits(Key_Bus,Key_Bus_L4 );
+  #endif
+ 
+  #if ( KEY16==1 )  /* çŸ©é˜µæŒ‰é”®åªèƒ½ä½¿ç”¨å•ä¸€æ€»çº¿ */
+  GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_L4 , GPIO_Speed_50MHz, GPIO_Mode_Out_PP);
+  GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_H4, GPIO_Speed_50MHz, GPIO_Mode_CLAMP);	
+  GPIO_SetBits  (Key_Bus, Key_Bus_L4 );
+  GPIO_ResetBits(Key_Bus, Key_Bus_H4);
+  #endif
 }
 
-/** &brief ¾ØÕó°´¼üÉ¨Ãè³ÌĞò KEY16_GPIODETECTION(void) 
-	* &param  None
-	*	&KeyTable:
-          |--P4---P5----P6----P7--\
-        P0|  1  |  2  |	 3  |	 4  | 
-        P1|	 5  |	 6  |	 7  |	 8  |
-        P2|	 9  |	10  |	11  |	12  |
-        P3|	 13 |	14  |	15  | 16  |
-          |-----------------------/
-	*/	
+/** &brief çŸ©é˜µæŒ‰é”®æ‰«æç¨‹åº KEY16_GPIODETECTION(void) 
+  * &param  None
+  * &KeyTable:
+    |--P4---P5----P6----P7--\
+  P0|  1  |  2  |  3  |	 4  | 
+  P1|  5  |  6  |  7  |	 8  |
+  P2|  9  | 10  | 11  |	12  |
+  P3|  13 | 14  | 15  | 16  |
+    |-----------------------/
+  */	
 Key_Num KEY16_GPIODETECTION(void)
 {
   uint16_t BusBuff=0;
   Key_Num  calc=Key_Up;
-	GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_L4 , GPIO_Speed_50MHz, GPIO_Mode_Out_PP);/*µÍËÄÎ»Êä³ö*/
-	GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_H4, GPIO_Speed_50MHz, GPIO_Mode_IPU);  /*¸ßËÄÎ»ÊäÈë*/
-	GPIO_SetBits  (Key_Bus,	Key_Bus_L4 );
-	GPIO_ResetBits(Key_Bus, Key_Bus_H4);
-	Delay_usms(1);
-	BusBuff = Key_Bus->IDR & Key_Bus_H4 ;/*¶Á¸ßËÄÎ» ¶ÁÁĞ*/	
-	switch (BusBuff)
-	{
-	  case 0x0010: calc=Key_1;break;
-		case 0x0020: calc=Key_2;break;
-		case 0x0040: calc=Key_3;break;
-		case 0x0080: calc=Key_4;break;
-		default  : calc=Key_Up;break;
-	}
+  GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_L4 , GPIO_Speed_50MHz, GPIO_Mode_Out_PP);/*ä½å››ä½è¾“å‡º*/
+  GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_H4, GPIO_Speed_50MHz, GPIO_Mode_IPU);  /*é«˜å››ä½è¾“å…¥*/
+  GPIO_SetBits  (Key_Bus,	Key_Bus_L4 );
+  GPIO_ResetBits(Key_Bus, Key_Bus_H4);
+  Delay_usms(1);
+  BusBuff = Key_Bus->IDR & Key_Bus_H4 ;/*è¯»é«˜å››ä½ è¯»åˆ—*/	
+  switch (BusBuff)
+  {
+    case 0x0010: calc=Key_1;break;
+    case 0x0020: calc=Key_2;break;
+    case 0x0040: calc=Key_3;break;
+    case 0x0080: calc=Key_4;break;
+    default  : calc=Key_Up;break;
+  }
 	
-	GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_L4 , GPIO_Speed_50MHz, GPIO_Mode_IPU);/*µÍËÄÎ»ÊäÈë*/
-	GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_H4, GPIO_Speed_50MHz, GPIO_Mode_Out_PP);/*¸ßËÄÎ»Êä³ö*/
-	GPIO_SetBits  (Key_Bus,	Key_Bus_H4 );
-	GPIO_ResetBits(Key_Bus, Key_Bus_L4);
-	Delay_usms(1);
-	BusBuff = Key_Bus->IDR & Key_Bus_L4;/*¶ÁµÍËÄÎ» ¶ÁĞĞ*/
-	switch (BusBuff)
-	{
-	  case 0x0001: calc+=0;break;
-		case 0x0002: calc+=4;break;
-		case 0x0004: calc+=8;break;
-		case 0x0008: calc+=12;break;
-		default  : calc=Key_Up;break;
-	}
-	return calc;
+ GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_L4 , GPIO_Speed_50MHz, GPIO_Mode_IPU);/*ä½å››ä½è¾“å…¥*/
+ GPIO_Config   (Key_Bus_CLK,Key_Bus, Key_Bus_H4, GPIO_Speed_50MHz, GPIO_Mode_Out_PP);/*é«˜å››ä½è¾“å‡º*/
+ GPIO_SetBits  (Key_Bus, Key_Bus_H4 );
+ GPIO_ResetBits(Key_Bus, Key_Bus_L4);
+ Delay_usms(1);
+ BusBuff = Key_Bus->IDR & Key_Bus_L4;/*è¯»ä½å››ä½ è¯»è¡Œ*/
+ switch (BusBuff)
+ {
+  case 0x0001: calc+=0;break;
+  case 0x0002: calc+=4;break;
+   case 0x0004: calc+=8;break;
+ 	case 0x0008: calc+=12;break;
+ 	default  : calc=Key_Up;break;
+ }
+ return calc;
 }
-/** &brief getKey(void) µ×²ã×Óº¯Êı
-	* &param  None
-	*	&returnvalue:
-			|---Name------Val---------------------------------------------------------------\
-			|		Key_Up		0     |                                                           |
-			|		Key_1			1     |   Key_2			2     |		Key_3			3     | 	Key_4			4     |
-			|		Key_5			5     |		Key_6			6     |		Key_7			7     |		Key_8			8     |
-			|   Key_9			9     |		Key_10		10    |		Key_11		11    |		Key_12		12    |
-			|   Key_13		13    |		Key_14		14    |		Key_15		15    |		Key_16		16    |
-			|-------------------------------------------------------------------------------/
-	*/
+/** &brief getKey(void) åº•å±‚å­å‡½æ•°
+ * &param  None
+ *	&returnvalue:
+ 		|---Name------Val---------------------------------------------------------------\
+ 		|		Key_Up		0     |                                                           |
+ 		|		Key_1			1     |   Key_2			2     |		Key_3			3     | 	Key_4			4     |
+ 		|		Key_5			5     |		Key_6			6     |		Key_7			7     |		Key_8			8     |
+ 		|   Key_9			9     |		Key_10		10    |		Key_11		11    |		Key_12		12    |
+ 		|   Key_13		13    |		Key_14		14    |		Key_15		15    |		Key_16		16    |
+   |-------------------------------------------------------------------------------/
+ */
 Key_Num getKeyIO(void)
 {
-	Key_Num return_buff = Key_Up;//³õÊ¼»¯°´¼ü¶ÁÈ¡»º³åÇø
-	#if ( KEYSPR==1 )		  			//Íê³É
-    KEYSPR_GPIODETECTION;     /*¶ÁÈ¡°´¼ü²¢·µ»Ø°´¼ü¹Ø¼ü×Ö*/
-	#endif /*KEY4*/
-	#if ( KEY16==1 )
+ Key_Num return_buff = Key_Up;//åˆå§‹åŒ–æŒ‰é”®è¯»å–ç¼“å†²åŒº
+ #if ( KEYSPR==1 )		  			//å®Œæˆ
+    KEYSPR_GPIODETECTION;     /*è¯»å–æŒ‰é”®å¹¶è¿”å›æŒ‰é”®å…³é”®å­—*/
+ #endif /*KEY4*/
+ #if ( KEY16==1 )
     return_buff = KEY16_GPIODETECTION();
-	#endif /*KEY16*/
-
+ #endif /*KEY16*/
+ 
   return return_buff;
 }
 
 /**	
-	* &brief  Key_Struct Key_Scan(Key_Scan_Operate Operate):ÓÃ»§½Ó¿Úº¯Êıs
-	* &param  Operat Read||Scan  
-	*	&returnvalue:Key_Struct
-      |---Name------Val---------------------------------------------------------------\
-      |   Key_Up    0     |                                                           |
-      |   Key_1	    1     |   Key_2			2     |   Key_3			3     |   Key_4			4     |
-      |   Key_5	    5     |   Key_6			6     |   Key_7			7     |   Key_8			8     |
-      |   Key_9	    9     |   Key_10		10    |   Key_11		11    |   Key_12		12    |
-      |   Key_13    13    |   Key_14		14    |   Key_15		15    |   Key_16		16    |
-      |-------------------------------------------------------------------------------/
-	* &attention:´Ëº¯ÊıĞèÒªÃ¿5-10ºÁÃëË¢ĞÂÒ»´Î  
-	* ÊµÏÖ¶Ì°´£¬³¤°´£¬Ïû¶¶£¬É¨ÃèÊ½¼ì²â°´¼üµ¯Æğ
-	* Key16Î´Íê³É
-	* °´¼üÉ¨Ãèº¯Êı£¬É¨ÃèÄ£Ê½ºÍ¶ÁÄ£Ê½£¬É¨ÃèÄ£Ê½½¨ÒéÃ¿5msÉ¨ÃèÒ»´Î£¬»òÕßÔÚmainº¯ÊıÀïÃæÔËĞĞ
-	*/
+ * &brief  Key_Struct Key_Scan(Key_Scan_Operate Operate):ç”¨æˆ·æ¥å£å‡½æ•°s
+ * &param  Operat Read||Scan  
+ * &returnvalue:Key_Struct
+      |---Name------Val----------------------------------------------------------------\
+      |   Key_Up    0     |                                                            |
+      |   Key_1	    1     |   Key_2      2     |   Key_3      3     |   Key_4    4     |
+      |   Key_5	    5     |   Key_6      6     |   Key_7      7     |   Key_8    8     |
+      |   Key_9	    9     |   Key_10    10     |   Key_11    11     |   Key_12   12    |
+      |   Key_13    13    |   Key_14    14     |   Key_15    15     |   Key_16   16    |
+      |--------------------------------------------------------------------------------/
+ * &attention:æ­¤å‡½æ•°éœ€è¦æ¯5-10æ¯«ç§’åˆ·æ–°ä¸€æ¬¡  
+ * å®ç°çŸ­æŒ‰ï¼Œé•¿æŒ‰ï¼Œæ¶ˆæŠ–ï¼Œæ‰«æå¼æ£€æµ‹æŒ‰é”®å¼¹èµ·
+ * Key16æœªå®Œæˆ
+ * æŒ‰é”®æ‰«æå‡½æ•°ï¼Œæ‰«ææ¨¡å¼å’Œè¯»æ¨¡å¼ï¼Œæ‰«ææ¨¡å¼å»ºè®®æ¯5msæ‰«æä¸€æ¬¡ï¼Œæˆ–è€…åœ¨mainå‡½æ•°é‡Œé¢è¿è¡Œ
+ */
 Key_Typedef Key_Scan(Key_Scan_Operate Operate)
 {
-	static KeyState_TypeDef Key_State;//°´¼ü×´Ì¬Ã¶¾Ù
-	static uint16_t Counter = 0,PressCounter = 0;        //É¨Ãè´ÎÊı¼ÆËãÆ÷
-	static Key_Typedef Key_Structer;
-	Key_Typedef Key_StructerBuff;
-	static Key_Num ReturnVal= Key_Up;
-  Key_Num Key_Buff = Key_Up;        //°´¼ü¶ÁÈ¡»º³åÇø
-	if(Operate == Read)               //ÊµÏÖ°´¼ü¶ÁÈ¡ºó½«¶ÁÈ¡±êÖ¾Î»Çå¿Õ
-	{
-		Key_StructerBuff = Key_Structer;
-	  Key_Structer.ReadFlag = 0;
-	  return Key_StructerBuff;
-	}
-	Key_Buff = (Key_Num)getKeyIO();		//Ã¿Ö´ĞĞÒ»´Îº¯ÊıÖ»¶ÁÒ»´ÎÖµ
-	switch(Key_State)
-	{
-		case Up:
-			if(Key_Buff != Key_Up){  //°´¼ü°´ÏÂ
-        Counter++;             //°´¼üÉ¨Ãè¼ÆÊıÖµÀÛ¼Ó
-			}
-			else{                    //Ä³¶ÎÊ±¼äËÉ¿ª
-				Counter = 0;           //Èç¹û°´¼üµ¯Æğ£¬¼ÇÂ¼Çå¿Õ  
-				PressCounter++;        //°´¼üµ¯ÆğÑÓ³¤Ò»ÏÂÉÏÒ»´Î¼üÖµºóÔÙ½«¼üÖµÖÃ¸ß
-				if(PressCounter>4)
-				{
-				  ReturnVal = Key_Up;
-					PressCounter = 0;
-				}
-			}
-			if(Counter>FILTERVAL){   //Èç¹û°´¼ü°´ÏÂ´ïµ½ÂË²¨Éè¶¨Öµ
-				Counter=0;             //°´¼üÉ¨Ãè¼ÆÊıÖµÇå¿Õ
-			  Key_State = Decline;   //°´¼ü×ªÎª°´ÏÂ¹ı³Ì×´Ì¬	
-				Key_Structer.Active.Press = Clear;//ÓÃÓÚÈ·±£¶Ì°´ºóµÄÏÂÒ»´Î°´ÏÂÊ±ÊÇÇå¿ÕµÄ
-				ReturnVal = (Key_Num)Key_Buff;//²¶×½µ½°´¼üÏÂ½µÑÓºóÊä³ö½¨Öµ
-			}
-			break;
-			
-		case Decline:
-			Key_State = Down;        //°´¼ü×ªÎª°´ÏÂ×´Ì¬	
-			Key_Structer.ReadFlag = 1;//µ±¼ì²âµ½ÏÂ½µÑÓºó±êÖ¾¶ÁÈ¡Î»
- 			break;		
-			
-		case Down:
-			if(Key_Buff == Key_Up){  //°´¼üµ¯Æğ¼ÆÊı
+  static KeyState_TypeDef Key_State;//æŒ‰é”®çŠ¶æ€æšä¸¾
+  static uint16_t Counter = 0,PressCounter = 0;        //æ‰«ææ¬¡æ•°è®¡ç®—å™¨
+  static Key_Typedef Key_Structer;
+  Key_Typedef Key_StructerBuff;
+  static Key_Num ReturnVal= Key_Up;
+  Key_Num Key_Buff = Key_Up;        //æŒ‰é”®è¯»å–ç¼“å†²åŒº
+  if(Operate == Read)               //å®ç°æŒ‰é”®è¯»å–åå°†è¯»å–æ ‡å¿—ä½æ¸…ç©º
+  {
+    Key_StructerBuff = Key_Structer;
+    Key_Structer.ReadFlag = 0;
+    return Key_StructerBuff;
+  }
+ Key_Buff = (Key_Num)getKeyIO();		//æ¯æ‰§è¡Œä¸€æ¬¡å‡½æ•°åªè¯»ä¸€æ¬¡å€¼
+ switch(Key_State)
+  {
+    case Up:
+    if(Key_Buff != Key_Up){  //æŒ‰é”®æŒ‰ä¸‹
+    Counter++;             //æŒ‰é”®æ‰«æè®¡æ•°å€¼ç´¯åŠ 
+  }
+   else{                    //æŸæ®µæ—¶é—´æ¾å¼€
+    Counter = 0;           //å¦‚æœæŒ‰é”®å¼¹èµ·ï¼Œè®°å½•æ¸…ç©º  
+    PressCounter++;        //æŒ‰é”®å¼¹èµ·å»¶é•¿ä¸€ä¸‹ä¸Šä¸€æ¬¡é”®å€¼åå†å°†é”®å€¼ç½®é«˜
+    if(PressCounter>4)
+    {
+      ReturnVal = Key_Up;
+     PressCounter = 0;
+    }
+   }
+   if(Counter>FILTERVAL){   //å¦‚æœæŒ‰é”®æŒ‰ä¸‹è¾¾åˆ°æ»¤æ³¢è®¾å®šå€¼
+    Counter=0;             //æŒ‰é”®æ‰«æè®¡æ•°å€¼æ¸…ç©º
+     Key_State = Decline;   //æŒ‰é”®è½¬ä¸ºæŒ‰ä¸‹è¿‡ç¨‹çŠ¶æ€	
+    Key_Structer.Active.Press = Clear;//ç”¨äºç¡®ä¿çŸ­æŒ‰åçš„ä¸‹ä¸€æ¬¡æŒ‰ä¸‹æ—¶æ˜¯æ¸…ç©ºçš„
+    ReturnVal = (Key_Num)Key_Buff;//æ•æ‰åˆ°æŒ‰é”®ä¸‹é™å»¶åè¾“å‡ºå»ºå€¼
+   }
+   break;
+    
+  case Decline:
+   Key_State = Down;        //æŒ‰é”®è½¬ä¸ºæŒ‰ä¸‹çŠ¶æ€	
+   Key_Structer.ReadFlag = 1;//å½“æ£€æµ‹åˆ°ä¸‹é™å»¶åæ ‡å¿—è¯»å–ä½
+    break;		
+   
+  case Down:
+   if(Key_Buff == Key_Up){  //æŒ‰é”®å¼¹èµ·è®¡æ•°
         Counter++;
-			}
-			else{
-			  Counter=0;
-				PressCounter ++;
-				if(PressCounter> 200){
-				  PressCounter = 200;
-				}
-				if(PressCounter>=PRESSTIME){//Èç¹û°´¼üµ¯°´ÏÂ´ïµ½³¤°´Öµ		 
-					Key_Structer.Active.Press = LongPress;
-				}	
-			}
-			if(Counter>FILTERVAL){   //Èç¹û°´¼üµ¯Æğ´ïµ½ÂË²¨Éè¶¨Öµ
-				Counter=0;             //°´¼üÉ¨Ãè¼ÆÊıÖµÇå¿Õ			
-			  Key_State = Rising;    //°´¼üµ¯Æğ
-				Key_Structer.Active.Press = Clear;//ÓÃÓÚÈ·±£°´ÏÂºó¼ì²â³¤°´Çå¿ÕÉÏÒ»´ÎµÄ×´Ì¬
-			}
-			break;	
-			
-		case Rising:										
-			Key_State = Up;          //°´¼üµ¯ÆğÒÀ¾É±£³ÖÉÏÒ»´Î¼üÖµ£¬ÒòÎª¶Ì°´Òªµ¯Æğºó²Ù×÷
-			if(PressCounter<PRESSTIME>>1){
-				Key_Structer.Active.Press = ShortPress;
-			}
-			PressCounter = 0;        //µ¯ÆğÇå¿Õ
-			break;
-		default: break;
-	}
-	Key_Structer.Name = ReturnVal;
-	return Key_Structer;
+   }
+   else{
+     Counter=0;
+    PressCounter ++;
+    if(PressCounter> 200){
+      PressCounter = 200;
+    }
+    if(PressCounter>=PRESSTIME){//å¦‚æœæŒ‰é”®å¼¹æŒ‰ä¸‹è¾¾åˆ°é•¿æŒ‰å€¼		 
+     Key_Structer.Active.Press = LongPress;
+    }	
+   }
+   if(Counter>FILTERVAL){   //å¦‚æœæŒ‰é”®å¼¹èµ·è¾¾åˆ°æ»¤æ³¢è®¾å®šå€¼
+    Counter=0;             //æŒ‰é”®æ‰«æè®¡æ•°å€¼æ¸…ç©º			
+     Key_State = Rising;    //æŒ‰é”®å¼¹èµ·
+    Key_Structer.Active.Press = Clear;//ç”¨äºç¡®ä¿æŒ‰ä¸‹åæ£€æµ‹é•¿æŒ‰æ¸…ç©ºä¸Šä¸€æ¬¡çš„çŠ¶æ€
+   }
+   break;	
+  	
+  case Rising:										
+   Key_State = Up;          //æŒ‰é”®å¼¹èµ·ä¾æ—§ä¿æŒä¸Šä¸€æ¬¡é”®å€¼ï¼Œå› ä¸ºçŸ­æŒ‰è¦å¼¹èµ·åæ“ä½œ
+   if(PressCounter<PRESSTIME>>1){
+    Key_Structer.Active.Press = ShortPress;
+   }
+    PressCounter = 0;        //å¼¹èµ·æ¸…ç©º
+    break;
+    default: break;
+  }
+  Key_Structer.Name = ReturnVal;
+  return Key_Structer;
 }
 
 void getKey()
 {
   Key_Typedef Key_Structer;
-	Key_Structer = Key_Scan(Read);
-
-	KeyBuffer.Name         = Key_Structer.Name;
-	KeyBuffer.ReadFlag     = Key_Structer.ReadFlag;
-	KeyBuffer.Active.Press = Key_Structer.Active.Press;
+  Key_Structer = Key_Scan(Read);
+ 
+  KeyBuffer.Name         = Key_Structer.Name;
+  KeyBuffer.ReadFlag     = Key_Structer.ReadFlag;
+  KeyBuffer.Active.Press = Key_Structer.Active.Press;
 }
 
 
